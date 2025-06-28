@@ -1,6 +1,6 @@
 package main
 
-import "github.com/RamendraGo/Banking/BANKING/app"
+import "github.com/RamendraGo/Banking/app"
 
 func main() {
 
