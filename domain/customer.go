@@ -1,5 +1,7 @@
 package domain
 
+import "github.com/RamendraGo/Banking/errs"
+
 type Customer struct {
 	CustomerId  string `json:"id" xml:"id"`
 	Name        string `json:"full_name" xml:"full_name"`
@@ -10,5 +12,6 @@ type Customer struct {
 }
 
 type CustomerRepository interface {
-	FindAll() ([]Customer, error)
+	FindAll(status string) ([]Customer, *errs.AppError)
+	GetCustomerById(id string) (*Customer, *errs.AppError)
 }

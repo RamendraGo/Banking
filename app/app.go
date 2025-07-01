@@ -26,6 +26,7 @@ func Start() {
 
 	// Set up the HTTP server and route
 	router.HandleFunc("/customers", ch.getAllCustomers).Methods(http.MethodGet)
+	router.HandleFunc("/customers/{customer_id:[0-9]+}", ch.getCustomerById).Methods(http.MethodGet)
 
 	fmt.Println("Starting server on http://localhost:8080")
 	log.Fatal(http.ListenAndServe("localhost:8080", router))
