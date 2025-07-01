@@ -1,7 +1,7 @@
 package domain
 
 type Customer struct {
-	ID          string `json:"id" xml:"id"`
+	CustomerId  string `json:"id" xml:"id"`
 	Name        string `json:"full_name" xml:"full_name"`
 	City        string `json:"city" xml:"city"`
 	Zipcode     string `json:"zipcode" xml:"zipcode"`

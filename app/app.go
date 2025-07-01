@@ -18,7 +18,11 @@ func Start() {
 	// Wiring up the handler function
 	// to the route
 
-	ch := CustomerHandlers{service: service.NewCustomerService(domain.NewCustomerRepositoryStub())}
+	// Use the stub repository for testing
+	//ch := CustomerHandlers{service: service.NewCustomerService(domain.NewCustomerRepositoryStub())}
+
+	// Use the database repository for production
+	ch := CustomerHandlers{service: service.NewCustomerService(domain.NewCustomerRepositoryDb())}
 
 	// Set up the HTTP server and route
 	router.HandleFunc("/customers", ch.getAllCustomers).Methods(http.MethodGet)
