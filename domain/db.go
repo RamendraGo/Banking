@@ -1,7 +1,6 @@
 package domain
 
 import (
-	"database/sql"
 	"fmt"
 	"log"
 	"net/url"
@@ -9,13 +8,34 @@ import (
 
 	"github.com/RamendraGo/Banking/logger"
 	_ "github.com/denisenkom/go-mssqldb" // Use SQL Server driver
+	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
 
 	"github.com/joho/godotenv"
 )
 
-var DB *sql.DB
+var DB *sqlx.DB
 var DBConnected = false
+
+func checkMissingEnvVars(dbUser, dbPassword, dbHost, dbPort, dbName string) []string {
+	var missing []string
+	if dbUser == "" {
+		missing = append(missing, "DB_USER")
+	}
+	if dbPassword == "" {
+		missing = append(missing, "DB_PASSWORD")
+	}
+	if dbHost == "" {
+		missing = append(missing, "DB_HOST")
+	}
+	if dbPort == "" {
+		missing = append(missing, "DB_PORT")
+	}
+	if dbName == "" {
+		missing = append(missing, "DB_NAME")
+	}
+	return missing
+}
 
 func Connect() {
 	// Load environment variables from .env file
@@ -31,7 +51,7 @@ func Connect() {
 	dbPort := os.Getenv("DB_PORT")
 	dbName := os.Getenv("DB_NAME")
 
-	//log.Printf("Connecting to database %s at %s:%s with user %s\n", dbName, dbHost, dbPort, dbUser)
+	// Connecting to database is now logged using logger.Info above.
 
 	logger.Info("Connecting to database",
 		zap.String("dbName", dbName),
@@ -41,24 +61,24 @@ func Connect() {
 	)
 
 	// Check if any of the required environment variables are missing
-	if dbUser == "" || dbPassword == "" || dbHost == "" || dbPort == "" || dbName == "" {
+	if missingEnvVars := checkMissingEnvVars(dbUser, dbPassword, dbHost, dbPort, dbName); len(missingEnvVars) > 0 {
 		log.Println("⚠ Missing database configuration in environment variables")
 
 		fmt.Println("Please set the following environment variables:")
-		fmt.Println("DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME")
+		for _, v := range missingEnvVars {
+			fmt.Println(v)
+		}
 		DBConnected = false
 		return
 
 	}
 
-	// Construct DSN (Data Source Name)
-
 	dsn := fmt.Sprintf("sqlserver://%s:%s@%s:%s?database=%s", dbUser, url.QueryEscape(dbPassword), dbHost, dbPort, dbName)
 
 	// Open MySQL connection
-	DB, err = sql.Open("sqlserver", dsn)
+	DB, err = sqlx.Open("sqlserver", dsn)
 	if err != nil {
-		log.Println("Database connection failed:", err)
+		logger.Info("Database connection failed", zap.Error(err))
 		DBConnected = false
 		return
 	}
