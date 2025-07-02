@@ -7,7 +7,9 @@ import (
 	"net/url"
 	"os"
 
+	"github.com/RamendraGo/Banking/logger"
 	_ "github.com/denisenkom/go-mssqldb" // Use SQL Server driver
+	"go.uber.org/zap"
 
 	"github.com/joho/godotenv"
 )
@@ -29,7 +31,14 @@ func Connect() {
 	dbPort := os.Getenv("DB_PORT")
 	dbName := os.Getenv("DB_NAME")
 
-	log.Printf("Connecting to database %s at %s:%s with user %s\n", dbName, dbHost, dbPort, dbUser)
+	//log.Printf("Connecting to database %s at %s:%s with user %s\n", dbName, dbHost, dbPort, dbUser)
+
+	logger.Info("Connecting to database",
+		zap.String("dbName", dbName),
+		zap.String("dbHost", dbHost),
+		zap.String("dbPort", dbPort),
+		zap.String("dbUser", dbUser),
+	)
 
 	// Check if any of the required environment variables are missing
 	if dbUser == "" || dbPassword == "" || dbHost == "" || dbPort == "" || dbName == "" {
@@ -56,11 +65,14 @@ func Connect() {
 
 	// Check if the database is reachable
 	if err = DB.Ping(); err != nil {
-		log.Println("Database is unreachable:", err)
+
+		logger.Info("Database is unreachable")
+
 		DBConnected = false
 		return
 	}
 
 	DBConnected = true
-	fmt.Println("Database connected successfully!")
+	logger.Info("Database connected successfully!")
+
 }
