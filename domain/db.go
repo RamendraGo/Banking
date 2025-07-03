@@ -96,3 +96,7 @@ func Connect() {
 	logger.Info("Database connected successfully!")
 
 }
+
+func GetDB() *sqlx.DB {
+	return DB
+}

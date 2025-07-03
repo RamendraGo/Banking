@@ -26,7 +26,7 @@ INSERT INTO customers VALUES
 
 DROP TABLE IF EXISTS accounts;
 CREATE TABLE accounts (
-  account_id int NOT NULL,
+  account_id int NOT NULL IDENTITY(95470,1),
   customer_id int NOT NULL,
   opening_date datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   account_type varchar(10) NOT NULL,
@@ -36,15 +36,15 @@ CREATE TABLE accounts (
   CONSTRAINT accounts_FK FOREIGN KEY (customer_id) REFERENCES customers (customer_id)
 ) 
 INSERT INTO accounts VALUES
-	(95470,2000,'2020-08-22 10:20:06', 'saving', 6823.23, 1),
-	(95471,2002,'2020-08-09 10:27:22', 'checking', 3342.96, 1),
-  (95472,2001,'2020-08-09 10:35:22', 'saving', 7000, 1),
-  (95473,2001,'2020-08-09 10:38:22', 'saving', 5861.86, 1);
+	(2000,'2020-08-22 10:20:06', 'saving', 6823.23, 1),
+	(2002,'2020-08-09 10:27:22', 'checking', 3342.96, 1),
+  (2001,'2020-08-09 10:35:22', 'saving', 7000, 1),
+  (2001,'2020-08-09 10:38:22', 'saving', 5861.86, 1);
 
 
 DROP TABLE IF EXISTS transactions;
 CREATE TABLE transactions (
-  transaction_id int NOT NULL,
+  transaction_id int IDENTITY(1,1),
   account_id int NOT NULL,
   amount decimal(10,2) NOT NULL,
   transaction_type varchar(10) NOT NULL,

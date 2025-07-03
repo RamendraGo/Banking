@@ -26,9 +26,8 @@ func checkMissingEnvVars(address, port string) []string {
 
 func Start() {
 
-	// define a Gorilla multiplexer
-	router := mux.NewRouter()
-	domain.Connect() // initializes domain.DB
+	domain.Connect()          // initializes domain.DB
+	router := mux.NewRouter() // define a Gorilla multiplexer
 
 	address := os.Getenv("SERVER_ADDRESS")
 	port := os.Getenv("SERVER_PORT")
@@ -51,11 +50,19 @@ func Start() {
 	//ch := CustomerHandlers{service: service.NewCustomerService(domain.NewCustomerRepositoryStub())}
 
 	// Use the database repository for production
-	ch := CustomerHandlers{service: service.NewCustomerService(domain.NewCustomerRepositoryDb(domain.DB))}
+
+	customerRepositoryDb := domain.NewCustomerRepositoryDb(domain.GetDB())
+
+	ch := CustomerHandlers{service: service.NewCustomerService(customerRepositoryDb)}
 
 	// Set up the HTTP server and route
 	router.HandleFunc("/customers", ch.getAllCustomers).Methods(http.MethodGet)
 	router.HandleFunc("/customers/{customer_id:[0-9]+}", ch.getCustomerById).Methods(http.MethodGet)
+
+	accountRepositoryDb := domain.NewAccountRepositoryDb(domain.GetDB())
+	ah := AccountHandlers{service: service.NewAccountService(accountRepositoryDb)}
+	// Set up the HTTP server and route
+	router.HandleFunc("/customers/{customer_id:[0-9]+}/account", ah.NewAccount).Methods(http.MethodPost)
 
 	fmt.Printf("Starting server on %s:%s\n", address, port)
 
