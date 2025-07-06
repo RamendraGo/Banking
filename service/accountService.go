@@ -18,6 +18,11 @@ type DefaultAccountService struct {
 	repo domain.AccountRepository
 }
 
+func NewAccountService(repository domain.AccountRepository) DefaultAccountService {
+
+	return DefaultAccountService{repo: repository}
+}
+
 func (s DefaultAccountService) NewAccount(req dto.NewAccountRequest) (*dto.NewAccountResponse, *errs.AppError) {
 
 	err := req.Validate()
@@ -49,9 +54,4 @@ func (s DefaultAccountService) NewAccount(req dto.NewAccountRequest) (*dto.NewAc
 
 	return &response, nil
 
-}
-
-func NewAccountService(repository domain.AccountRepository) DefaultAccountService {
-
-	return DefaultAccountService{repo: repository}
 }

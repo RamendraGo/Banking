@@ -14,6 +14,31 @@ type AccountRepositoryDb struct {
 	client *sqlx.DB
 }
 
+func NewAccountRepositoryDb(dbClient *sqlx.DB) *AccountRepositoryDb {
+
+	logger.Info("Creating new AccountRepositoryDb")
+	return &AccountRepositoryDb{client: dbClient}
+}
+
+func (d *AccountRepositoryDb) FindBy(accountId string) (*Account, *errs.AppError) {
+	var account Account
+	query := "SELECT account_id, customer_id, opening_date, account_type, amount, status FROM accounts WHERE account_id = @p1"
+	err := d.client.Get(&account, query, accountId)
+	if err != nil {
+		return nil, errs.NewUnexpectedError("unexpected error occurred while retrieving account", 50)
+	}
+
+	return &account, nil
+}
+
+func (d *AccountRepositoryDb) CanWithdraw(accountId string, amount float64) (bool, *errs.AppError) {
+	account, err := d.FindBy(accountId)
+	if err != nil {
+		return false, err
+	}
+	return account.Amount >= amount, nil
+}
+
 func (d *AccountRepositoryDb) Save(a Account) (*Account, *errs.AppError) {
 
 	sqlInsert := `
@@ -54,10 +79,4 @@ VALUES (:customer_id, :opening_date, :account_type, :amount, :status)
 
 	a.AccountId = int(id)
 	return &a, nil
-}
-
-func NewAccountRepositoryDb(dbClient *sqlx.DB) *AccountRepositoryDb {
-
-	logger.Info("Creating new AccountRepositoryDb")
-	return &AccountRepositoryDb{client: dbClient}
 }

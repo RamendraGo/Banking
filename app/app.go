@@ -52,9 +52,7 @@ func Start() {
 	// Use the database repository for production
 
 	customerRepositoryDb := domain.NewCustomerRepositoryDb(domain.GetDB())
-
 	ch := CustomerHandlers{service: service.NewCustomerService(customerRepositoryDb)}
-
 	// Set up the HTTP server and route
 	router.HandleFunc("/customers", ch.getAllCustomers).Methods(http.MethodGet)
 	router.HandleFunc("/customers/{customer_id:[0-9]+}", ch.getCustomerById).Methods(http.MethodGet)
@@ -63,6 +61,12 @@ func Start() {
 	ah := AccountHandlers{service: service.NewAccountService(accountRepositoryDb)}
 	// Set up the HTTP server and route
 	router.HandleFunc("/customers/{customer_id:[0-9]+}/account", ah.NewAccount).Methods(http.MethodPost)
+
+	transactionRepositoryDb := domain.NewTransactionRepositoryDb(domain.GetDB())
+	th := TransactionHandlers{service: service.NewTransactionService(transactionRepositoryDb, accountRepositoryDb)}
+	// Set up the HTTP server and route
+	router.HandleFunc("/customers/{customer_id:[0-9]+}/account/{account_id:[0-9]+}", th.NewTransaction).Methods(http.MethodPost)
+	//router.HandleFunc("/account/{account_id:[0-9]+}/transaction", th.NewTransaction).Methods(http.MethodPost)
 
 	fmt.Printf("Starting server on %s:%s\n", address, port)
 

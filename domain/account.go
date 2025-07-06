@@ -16,8 +16,10 @@ type Account struct {
 
 type AccountRepository interface {
 	Save(Account) (*Account, *errs.AppError)
+	FindBy(accountId string) (*Account, *errs.AppError)
+	CanWithdraw(accountId string, amount float64) (bool, *errs.AppError)
 }
 
 func (a Account) ToNewAccountResponseDto() dto.NewAccountResponse {
-	return dto.NewAccountResponse{a.AccountId}
+	return dto.NewAccountResponse{AccountId: a.AccountId}
 }
